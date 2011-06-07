@@ -1,0 +1,15 @@
+gprof_compare is a little utility which can help you profile differences in
+runtime between multiple runs of the same application.  First, use gprof to
+obtain profiling information for the software in question.  Now, make a change
+to the software or input, run gprof again, and compare the profiling traces
+using gprof_compare:
+
+  % gprof_compare gmon1.out gmon2.out
+
+If you sort the output using "sort -n -k 1" then you'll be able to find the
+functions which changed the most in terms of the number of calls.  This is very
+useful in finding scaling issues in data-intensive code, and verifying that
+performance-related changes do what you want them to do, and only what you want
+them to do.
+
+Erik Garrison <erik@hypervolu.me>

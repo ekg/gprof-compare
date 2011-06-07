@@ -1,0 +1,52 @@
+#!/usr/bin/python
+
+import sys
+
+def parse_gprof(filename):
+    file = open(filename)
+    call_table = {}
+    percentage_table = {}
+    time_table = {}
+    for line in file:
+        if line.startswith('# '):  # only want the first part of the output
+            break
+        try:
+            fields = line.strip().split()[:6]
+            function = line.strip().split('  ')[-1].strip()
+            if function != 'main':
+                call_table[function] = int(fields[3])
+            time_table[function] = float(fields[2])
+            percentage_table[function] = float(fields[0])
+        except:
+            pass
+    return call_table, percentage_table, time_table
+
+if len(sys.argv) < 3:
+    print 'usage', sys.argv[0], '<gprof_output1> <gprof_output2>'
+    print 'Provides a table describing the ratio in number of calls for each'
+    print 'function in the gprof output from each run.  Useful for finding'
+    print 'poorly-scaling hotspots in processing systems.'
+    print 'table format:'
+    print 'call ratio, 1 % runtime, 1 call count, 2 % runtime, 2 call count, function'
+    exit()
+
+a_calls, a_percentages, a_times = parse_gprof(sys.argv[1])
+b_calls, b_percentages, b_times = parse_gprof(sys.argv[2])
+
+for k,v in a_calls.iteritems():
+    try:
+        if v > 0 and b_calls[k] > 0:
+            print '\t'.join(map(str, ['%03f' % (float(v) / b_calls[k]),
+                                                    a_percentages[k],
+                                                    a_times[k],
+                                                    a_calls[k],
+                                                    b_percentages[k],
+                                                    b_times[k],
+                                                    b_calls[k],
+                                                    k]))
+    except:
+        pass
+
+
+
+
